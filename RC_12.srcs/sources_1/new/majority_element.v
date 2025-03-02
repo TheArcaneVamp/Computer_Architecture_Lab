@@ -24,5 +24,5 @@ module majority_element(
                       input [2:0]p,
                       output m
                       );
-                      assign m = (p[2]&&p[1])||(p[1]&&p[0]);
+  assign m = (p[2]&&p[0])||(p[2]&&p[1]&&(!p[0]))||(!p[2]&&p[1]&&p[0]);
 endmodule
