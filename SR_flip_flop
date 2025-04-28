@@ -1,0 +1,88 @@
+module SR_flipflop (
+    input S,
+    input R,
+    input CLK,
+    input PR,
+    input CLR,
+    output Q,
+    output Q_bar
+);
+
+    reg qm = 0;
+
+    always @(posedge CLK)
+        if (PR == 1) begin
+            qm = 1;
+        end else if (CLR == 0) begin
+            qm = 0;
+        end else if (S == 1 && R == 0) begin
+            qm = 1;
+        end else if (S == 0 && R == 1) begin
+            qm = 0;
+        end else if (S == 0 && R == 0) begin
+            qm = qm; // No change
+        end
+        // The case where S=1 and R=1 is typically avoided in a simple SR flip-flop
+        // as it leads to an undefined or oscillatory state.
+
+    assign Q = qm;
+    assign Q_bar = ~qm;
+
+endmodule
+
+
+module SR_test();
+//module JK_flipflop_test();               
+//Inputs
+reg S;
+reg R;
+reg CLK;
+reg CLR;
+reg PR;               
+//Outputs
+wire Q;
+wire Q_bar;               
+//Instantiate the Unit Under Test (UUT)
+SR_flipflop uut (  .S(S), .R(R), .CLK(CLK), .CLR(CLR),  .PR(PR), .Q(Q), .Q_bar(Q_bar));
+        initial begin                              
+        //Initialize Inputs
+        CLK= 0;                             
+        //Wait 100 ns for global reset to finish
+        S=0;
+        R=0;
+        CLR=1;
+        PR=0;
+        #100;
+        S=0;
+        R=1;
+        CLR=1;
+        PR=0;
+        #100;
+        S=1;
+        R=0;
+        CLR=1;
+        PR=0;
+        #100;
+        S=1;
+        R=1;
+        CLR=1;
+        PR=0;
+        #100;
+        S=0;
+        R=0;
+        #100;
+        S=0;
+        R=0;
+        CLR=1;
+        PR=1;
+        #100;
+        S=0;
+        R=0;
+        CLR=0;
+        PR=0;
+        #100;
+        end
+    always #50 CLK=~CLK;  
+endmodule
+
+
