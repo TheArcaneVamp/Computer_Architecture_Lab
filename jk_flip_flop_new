@@ -1,0 +1,63 @@
+module jk_ff (
+    input wire clk,
+    input wire j,
+    input wire k,
+    output reg q,
+    output wire qn
+);
+    assign qn = ~q;
+
+    always @(posedge clk) begin
+        case ({j, k})
+            2'b00: q <= q;        // No change
+            2'b01: q <= 0;        // Reset
+            2'b10: q <= 1;        // Set
+            2'b11: q <= ~q;       // Toggle
+        endcase
+    end
+endmodule
+
+##Test Bench##
+
+module tb_jk_ff;
+    reg clk;
+    reg j, k;
+    wire q, qn;
+
+    // Instantiate the JK flip-flop
+    jk_ff uut (
+        .clk(clk),
+        .j(j),
+        .k(k),
+        .q(q),
+        .qn(qn)
+    );
+
+    // Clock generator
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // 10 time units clock period
+    end
+
+    // Test sequence
+    initial begin
+        // Initialize inputs
+        j = 0; k = 0;
+        #10;
+
+        // Test cases
+        j = 0; k = 0; #10; // No change
+        j = 0; k = 1; #10; // Reset
+        j = 1; k = 0; #10; // Set
+        j = 1; k = 1; #10; // Toggle
+        j = 1; k = 1; #10; // Toggle again
+        j = 0; k = 0; #10; // No change
+
+        // End simulation
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d clk=%b j=%b k=%b q=%b qn=%b", $time, clk, j, k, q, qn);
+    end
+endmodule
